@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 @Builder
 public class LoginResponseDTO {
 
+    private Long userid;
     private String token;
     private String tokenType;
     private String message;

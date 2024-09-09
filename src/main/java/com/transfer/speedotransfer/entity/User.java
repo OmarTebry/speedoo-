@@ -81,7 +81,7 @@ public class User {
                 .name(this.name)
                 .email(this.email)
                 .country(this.country)
-                .phoneNumber(this.phoneNumber)
+                .dateOfBirth(this.dateOfBirth)
                 .phoneNumber(this.phoneNumber)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
