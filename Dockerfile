@@ -1,26 +1,31 @@
-# Use Maven image with OpenJDK 21 to build the app
-FROM maven:3.8.5-openjdk-21 AS build
+# Use an official OpenJDK 21 image as a base
+FROM eclipse-temurin:21-jdk AS build
+
+# Install Maven
+RUN apt-get update && \
+    apt-get install -y maven && \
+    apt-get clean
+
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the pom.xml file and download project dependencies (this will cache dependencies if unchanged)
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
+# Copy the project files into the container
+COPY . .
 
-# Copy the source code to the Docker image
-COPY src ./src
+# Package the application (skip tests to speed up the build process)
+RUN mvn -B -DskipTests clean package
 
-# Build the project and package the Spring Boot app (skip tests for faster builds)
-RUN mvn package -DskipTests
+# Stage 2: Create a smaller image to run the app
+FROM eclipse-temurin:21-jre
 
-# Use a lightweight JDK 21 image to run the app
-FROM openjdk:21-jdk-slim
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the built jar file from the Maven image
+# Copy the packaged JAR file from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose the port your app runs on (8080 by default)
+# Expose port 8080 for the Spring Boot app
 EXPOSE 8080
 
-# Run the Spring Boot application
+# Command to run the Spring Boot application
 ENTRYPOINT ["java", "-jar", "app.jar"]
