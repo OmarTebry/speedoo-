@@ -75,6 +75,20 @@ public class TransactionService implements ITransactionService {
             return failedTransaction.toResponse();
         }
 
+        if (!sender.getCurrency().equals(recipient.getCurrency())) {
+            Transaction failedTransaction = Transaction.builder()
+                    .senderAccountNumber(transactionRequestDTO.getSenderAccountNumber())
+                    .recipientAccountNumber(transactionRequestDTO.getRecipientAccountNumber())
+                    .amount(transactionRequestDTO.getAmount())
+                    .currency(sender.getCurrency())
+                    .status(TransactionStatus.FAILED)
+                    .message("Currency mismatch: Transaction cannot be completed between different currencies.")
+                    .user(user)
+                    .build();
+
+            this.transactionRepository.save(failedTransaction);
+            return failedTransaction.toResponse();
+        }
 
         Transaction successfulTransaction = Transaction.builder()
                 .senderAccountNumber(transactionRequestDTO.getSenderAccountNumber())
@@ -92,8 +106,6 @@ public class TransactionService implements ITransactionService {
 
 
         Transaction savedTransaction = this.transactionRepository.save(successfulTransaction);
-
-
         return savedTransaction.toResponse();
     }
 

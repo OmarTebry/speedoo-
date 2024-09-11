@@ -2,6 +2,7 @@ package com.transfer.speedotransfer.dto;
 
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,5 +24,6 @@ public class TransactionRequestDTO {
     @NotNull
     private String recipientAccountNumber;
     @NotNull
+    @Positive(message = "Amount must be greater than 0")
     private Double amount;
 }

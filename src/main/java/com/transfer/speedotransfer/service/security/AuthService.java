@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.time.Period;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +47,10 @@ public class AuthService implements IAuthService {
 
         if ( userRequest.getPassword().length() < 8) {
             throw new IllegalArgumentException("Password must be at least 8 characters long.");
+        }
+
+        if (Period.between(userRequest.getDateOfBirth(), LocalDate.now()).getYears() < 18) {
+            throw new IllegalArgumentException("User must be over 18 years old to register.");
         }
 
         User user = User.builder()
