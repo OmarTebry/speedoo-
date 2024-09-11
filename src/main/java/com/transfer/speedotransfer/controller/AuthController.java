@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "https://speedo-production.up.railway.app")
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Validated
@@ -37,7 +38,6 @@ public class AuthController {
     @Operation(summary = "Login and generate JWT")
     @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = LoginResponseDTO.class), mediaType = "application/json")})
     @ApiResponse(responseCode = "401", content = {@Content(schema = @Schema(implementation = ErrorDetails.class), mediaType = "application/json")})
-    @CrossOrigin(origins = "https://speedo-production.up.railway.app")
     @PostMapping("/login")
     public LoginResponseDTO login(@RequestBody @Valid LoginRequestDTO loginRequestDTO) {
         return this.authService.login(loginRequestDTO);
