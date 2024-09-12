@@ -14,6 +14,7 @@ import com.transfer.speedotransfer.repository.TransactionRepository;
 import com.transfer.speedotransfer.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,6 +111,7 @@ public class TransactionService implements ITransactionService {
     }
 
     @Override
+    @Cacheable("transactions")
     public List<TransactionDTO> getTransactionsByUserId(Long userId) throws ResourceNotFoundException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));

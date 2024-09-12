@@ -10,6 +10,10 @@ import com.transfer.speedotransfer.entity.Account;
 import com.transfer.speedotransfer.entity.User;
 import com.transfer.speedotransfer.exception.custom.UserAlreadyExistException;
 import com.transfer.speedotransfer.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.annotation.Cacheable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,8 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
-import java.time.LocalDate;
-import java.time.Period;
 
 @Service
 @RequiredArgsConstructor
@@ -47,10 +49,6 @@ public class AuthService implements IAuthService {
 
         if ( userRequest.getPassword().length() < 8) {
             throw new IllegalArgumentException("Password must be at least 8 characters long.");
-        }
-
-        if (Period.between(userRequest.getDateOfBirth(), LocalDate.now()).getYears() < 18) {
-            throw new IllegalArgumentException("User must be over 18 years old to register.");
         }
 
         User user = User.builder()
@@ -79,6 +77,7 @@ public class AuthService implements IAuthService {
     }
 
     @Override
+    @Cacheable(value = "users", key = "#loginRequestDTO.email")
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
 
         Authentication authentication = authenticationManager.authenticate(
@@ -95,8 +94,25 @@ public class AuthService implements IAuthService {
                 .userid(user.getId())
                 .token(jwt)
                 .message("Login Successful")
-                .status(HttpStatus.ACCEPTED)
                 .tokenType("Bearer")
                 .build();
     }
+
+    @Cacheable(value = "users", key = "#email")
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found"));
+    }
+
+    @CachePut(value = "users", key = "#user.email")
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @CacheEvict(value = "users", key = "#email")
+    public void deleteUserByEmail(String email) {
+        userRepository.deleteByEmail(email);
+    }
+
+
 }

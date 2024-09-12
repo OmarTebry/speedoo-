@@ -7,6 +7,7 @@ import com.transfer.speedotransfer.exception.custom.ResourceNotFoundException;
 import com.transfer.speedotransfer.exception.custom.UserAlreadyExistException;
 import com.transfer.speedotransfer.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Cacheable("users")
     public UserDTO getUserById(Long UserId) throws ResourceNotFoundException {
         return this.userRepository.findById(UserId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"))
