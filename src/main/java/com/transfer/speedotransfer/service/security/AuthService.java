@@ -60,7 +60,7 @@ public class AuthService implements IAuthService {
                 .build();
 
         Account account = Account.builder()
-                .balance(1000.0)
+                .balance(10000.0)
                 .accountType(AccountType.SAVINGS)
                 .accountDescription("Savings Account")
                 .accountName("Savings Account")
